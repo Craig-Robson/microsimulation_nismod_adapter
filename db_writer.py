@@ -22,7 +22,17 @@ data_version = cfg['api parameters']['data_version']
 data_location = os.path.abspath('..', 'microsimulation', 'data')
 data_files = glob.glob(data_location+'.*.csv')
 
+# loop through all data files
 for file_path in data_files:
+    # create dataframe with data
     data_frame = pandas.read_csv(file_path)
 
-response = requests.post('%s?year=%s&scale=%s&data_version=%s' %(url, year, scale, data_version), auth=(username, password), data=dataframe.to_json())
+    # get the metadata for the file
+    file_str = file_path.split('/')[0]
+    file_str.split('_')
+
+    # get data values
+    data_lad = file_str[1]
+    data_year = file_str[-1]
+
+response = requests.post('%s?year=%s&scale=%s&data_version=%s' %(url, data_year, scale, data_version), auth=(username, password), data=dataframe.to_json())
