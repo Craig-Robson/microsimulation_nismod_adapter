@@ -1,3 +1,15 @@
+"""
+file patterns
+household_microsynth
+    hh_LADCODE_SCALE_2011.csv
+microsynth - microsynth
+    ????
+microsynth - ssm
+    ssm_LADCODE_SCALE_ppp_YEAR.csv
+microsynth - assignment
+    ass_LADCODE_SCALE_YEAR.csv
+    ass_hh_LADCODE_SCALE_YEAR.csv
+"""
 import pandas
 import requests
 import os, configparser
@@ -14,13 +26,14 @@ username = cfg['api']['username']
 password = cfg['api']['password']
 
 # data details
-year = cfg['api parameters']['year']
 scale = cfg['api parameters']['scale']
 data_version = cfg['api parameters']['data_version']
 
 # read in the data files
 data_location = os.path.abspath('..', 'microsimulation', 'data')
-data_files = glob.glob(data_location+'.*.csv')
+
+# get only the data files for the final hh assignment
+data_files = glob.glob(data_location+'.ass_hh_*.csv')
 
 # loop through all data files
 for file_path in data_files:
@@ -34,5 +47,7 @@ for file_path in data_files:
     # get data values
     data_lad = file_str[1]
     data_year = file_str[-1]
+    data_scale = file_str[-2]
 
-response = requests.post('%s?year=%s&scale=%s&data_version=%s' %(url, data_year, scale, data_version), auth=(username, password), data=dataframe.to_json())
+    # push data to database
+    response = requests.post('%s?year=%s&scale=%s&data_version=%s' %(url, data_year, data_scale, data_version), auth=(username, password), data=data_frame.to_json())
